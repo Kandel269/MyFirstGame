@@ -44,6 +44,7 @@ class Game():
         if keys[pygame.K_LEFT]:
             self.player.x -= int(round(PLAYER_SPEED * self.dt))
         if keys[pygame.K_SPACE] and not self.player.during_jump:
+            self.player.max_jump_y = self.player.y - MAX_JUMP
             self.player.during_jump = True
 
 
@@ -56,9 +57,11 @@ class Game():
             self.tiles.append(Tile(450, y * 32, "enemy1"))
 
         while True:
-
             if self.player.during_jump:
-                self.player.jump()
+                if self.player.y <= self.player.max_jump_y:
+                    self.player.jump("down")
+                else:
+                    self.player.jump("up")
             self.check_keys()
             self.check_events()
             self.refresh_screen()

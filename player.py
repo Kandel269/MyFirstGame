@@ -8,8 +8,12 @@ class Player(pygame.Rect):
         self.h = 20
         self.w = 20
         self.hp = 3
+
+        self.max_jump_y = MAX_JUMP
         self.during_jump = False
 
-    def jump(self):
-        self.y -= JUMP_SPEED
-
+    def jump(self, direction):
+        if direction == "up":
+            self.y -= JUMP_SPEED
+        else:
+            self.y += JUMP_SPEED
