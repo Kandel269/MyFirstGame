@@ -24,7 +24,7 @@ class Game():
 
         self.collision_types = {}
 
-        self.enemy_list = []
+        self.enemies_list = []
 
         self.game()
 
@@ -72,13 +72,16 @@ class Game():
 
     def create_enemy(self):
         if random.randint(1,CREATE_ENEMY_RATIO) == 1:
-            x = random.randint(30,1250)
-            self.enemy_list.append(Bomb(x,-50,"enemy2"))
+            x = random.randint(30,430)
+            self.enemies_list.append(Bomb(x, -100, "enemy2"))
 
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.close()
+            if event.type == self.ENEMYMOVE:
+                for enemy in self.enemies_list:
+                    enemy.move()
 
     def close(self):
         pygame.quit()
@@ -95,6 +98,8 @@ class Game():
             self.player.during_jump = True
 
     def game(self):
+        self.ENEMYMOVE = pygame.USEREVENT
+        pygame.time.set_timer(self.ENEMYMOVE, ENEMY_MOVE_RATIO)
 
         for x in range(16):
             self.tiles.append(Tile((x * 30), 290, "enemy1"))
@@ -119,6 +124,10 @@ class Game():
             # enemy
             self.create_enemy()
 
+            for enemy in self.enemies_list:
+                if enemy.y > DRAW_SCREEN_SIZE[1]:
+                    self.enemies_list.remove(enemy)
+
             self.refresh_screen()
             self.draw()
 
@@ -127,6 +136,8 @@ class Game():
         self.draw_screen.blit(self.textures["player"],self.player)
         for tile in self.tiles:
             self.draw_screen.blit(self.textures[tile.tile_name], tile)
+        for enemy in self.enemies_list:
+            self.draw_screen.blit(self.textures[enemy.enemy_name], enemy)
 
     def refresh_screen(self):
         scaled = pygame.transform.scale(self.draw_screen, SCREEN_SIZE)
