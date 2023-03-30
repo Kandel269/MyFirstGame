@@ -20,6 +20,8 @@ class Game():
         self.player = Player()
         self.tiles = []
 
+        self.collision_types = {}
+
         self.game()
 
     def load_textures(self):
@@ -36,27 +38,33 @@ class Game():
         return hit_list
 
     def move_player(self):
-        collision_types = {'top': False, 'bottom': False, 'left': False, 'right': False}
+        self.collision_types = {'top': False, 'bottom': False, 'left': False, 'right': False}
         self.player.x += self.player.x_speed
         hit_list = self.colision_test_player()
         for tile in hit_list:
             if self.player.x_speed > 0:
                 self.player.right = tile.left
-                collision_types['right'] = True
+                self.collision_types['right'] = True
             elif self.player.x_speed < 0:
                 self.player.left = tile.right
-                collision_types['left'] = True
+                self.collision_types['left'] = True
 
-        self.player.y += self.player.y_speed
+        if self.player.during_jump:
+            if self.player.air_timer <= MAX_JUMP:
+                self.player.y += self.player.y_speed - JUMP_SPEED
+            else:
+                self.player.y += self.player.y_speed
+        else:
+            self.player.y += self.player.y_speed
+
         hit_list = self.colision_test_player()
         for tile in hit_list:
             if self.player.y_speed > 0:
                 self.player.bottom = tile.top
-                collision_types['bottom'] = True
+                self.collision_types['bottom'] = True
             elif self.player.y_speed < 0:
                 self.player.top = tile.bottom
-                collision_types['top'] = True
-
+                self.collision_types['top'] = True
 
     def check_events(self):
         for event in pygame.event.get():
@@ -64,6 +72,12 @@ class Game():
                 self.close()
 
         self.move_player()
+        if self.collision_types['bottom']:
+            self.player.air_timer = 0
+            self.player.during_jump = False
+        else:
+            self.player.air_timer += 1
+
         self.player.reset_speed()
 
     def close(self):
@@ -76,10 +90,9 @@ class Game():
             self.player.x_speed += int(round(PLAYER_SPEED * self.dt))
         if keys[pygame.K_LEFT]:
             self.player.x_speed -= int(round(PLAYER_SPEED * self.dt))
-        if keys[pygame.K_SPACE] and not self.player.during_jump:
-            self.player.max_jump_y = self.player.y - MAX_JUMP
+        if keys[pygame.K_SPACE] and self.player.air_timer < 5 and not self.player.during_jump:
+            self.player.y_speed -= JUMP_SPEED
             self.player.during_jump = True
-
 
     def game(self):
 
@@ -90,9 +103,6 @@ class Game():
             self.tiles.append(Tile(450, y * 32, "enemy1"))
 
         while True:
-            # if self.player.during_jump:
-            #     if self.player.y >= self.player.max_jump_y:
-            #         self.player.jump("up")
             self.check_keys()
             self.check_events()
             self.refresh_screen()
