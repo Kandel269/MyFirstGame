@@ -7,6 +7,7 @@ from SETTINGS import *
 from tile import *
 from player import *
 from enemy import *
+from bonus import *
 
 class Game():
     def __init__(self):
@@ -25,6 +26,7 @@ class Game():
         self.collision_types = {}
 
         self.enemies_list = []
+        self.bonus_list = []
 
         self.game()
 
@@ -75,6 +77,12 @@ class Game():
             x = random.randint(30,430)
             self.enemies_list.append(Bomb(x, -100, "enemy2"))
 
+    def create_bonus(self):
+        if random.randint(1, CREATE_BONUS_RATIO) == 1:
+            x = random.randint(30,430)
+            self.bonus_list.append(Bonus(x, -100, "enemy3", 100))
+
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -82,6 +90,9 @@ class Game():
             if event.type == self.ENEMYMOVE:
                 for enemy in self.enemies_list:
                     enemy.move()
+            if event.type == self.BONUSMOVE:
+                for bonus in self.bonus_list:
+                    bonus.move()
 
     def close(self):
         pygame.quit()
@@ -100,6 +111,9 @@ class Game():
     def game(self):
         self.ENEMYMOVE = pygame.USEREVENT
         pygame.time.set_timer(self.ENEMYMOVE, ENEMY_MOVE_RATIO)
+
+        self.BONUSMOVE = pygame.USEREVENT
+        pygame.time.set_timer(self.BONUSMOVE, ENEMY_MOVE_RATIO)
 
         for x in range(16):
             self.tiles.append(Tile((x * 30), 290, "enemy1"))
@@ -128,6 +142,9 @@ class Game():
                 if enemy.y > DRAW_SCREEN_SIZE[1]:
                     self.enemies_list.remove(enemy)
 
+            # bonus
+            self.create_bonus()
+
             self.refresh_screen()
             self.draw()
 
@@ -138,6 +155,8 @@ class Game():
             self.draw_screen.blit(self.textures[tile.tile_name], tile)
         for enemy in self.enemies_list:
             self.draw_screen.blit(self.textures[enemy.enemy_name], enemy)
+        for bonus in self.bonus_list:
+            self.draw_screen.blit(self.textures[bonus.bonus_name], bonus)
 
     def refresh_screen(self):
         scaled = pygame.transform.scale(self.draw_screen, SCREEN_SIZE)
