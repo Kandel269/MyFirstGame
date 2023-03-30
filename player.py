@@ -12,6 +12,7 @@ class Player(pygame.Rect):
         self.w = 20
         self.hp = 3
 
+
         self.max_jump_y = MAX_JUMP
         self.during_jump = False
 
@@ -21,9 +22,9 @@ class Player(pygame.Rect):
         else:
             self.y += JUMP_SPEED
 
-    def move(self):
-        self.y = self.y + self.y_speed
-        self.x = self.x + self.x_speed
+    # def move(self):
+    #     self.y = self.y + self.y_speed
+    #     self.x = self.x + self.x_speed
 
     def reset_speed(self):
         self.x_speed = 0

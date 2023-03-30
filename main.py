@@ -35,7 +35,7 @@ class Game():
                 hit_list.append(tile)
         return hit_list
 
-    def move_player(self, movement, tiles):
+    def move_player(self):
         collision_types = {'top': False, 'bottom': False, 'left': False, 'right': False}
         self.player.x += self.player.x_speed
         hit_list = self.colision_test_player()
@@ -48,6 +48,7 @@ class Game():
                 collision_types['left'] = True
 
         self.player.y += self.player.y_speed
+        hit_list = self.colision_test_player()
         for tile in hit_list:
             if self.player.y_speed > 0:
                 self.player.bottom = tile.top
@@ -55,7 +56,7 @@ class Game():
             elif self.player.y_speed < 0:
                 self.player.top = tile.bottom
                 collision_types['top'] = True
-        return collision_types
+
 
     def check_events(self):
         for event in pygame.event.get():
