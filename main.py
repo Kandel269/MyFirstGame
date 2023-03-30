@@ -1,10 +1,12 @@
 import os
+import random
 import sys
 import pygame
 
 from SETTINGS import *
 from tile import *
 from player import *
+from enemy import *
 
 class Game():
     def __init__(self):
@@ -21,6 +23,8 @@ class Game():
         self.tiles = []
 
         self.collision_types = {}
+
+        self.enemy_list = []
 
         self.game()
 
@@ -66,19 +70,15 @@ class Game():
                 self.player.top = tile.bottom
                 self.collision_types['top'] = True
 
+    def create_enemy(self):
+        if random.randint(1,CREATE_ENEMY_RATIO) == 1:
+            x = random.randint(30,1250)
+            self.enemy_list.append(Bomb(x,-50,"enemy2"))
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.close()
-
-        self.move_player()
-        if self.collision_types['bottom']:
-            self.player.air_timer = 0
-            self.player.during_jump = False
-        else:
-            self.player.air_timer += 1
-
-        self.player.reset_speed()
 
     def close(self):
         pygame.quit()
@@ -105,6 +105,20 @@ class Game():
         while True:
             self.check_keys()
             self.check_events()
+
+
+            # player move
+            self.move_player()
+            if self.collision_types['bottom']:
+                self.player.air_timer = 0
+                self.player.during_jump = False
+            else:
+                self.player.air_timer += 1
+            self.player.reset_speed()
+
+            # enemy
+            self.create_enemy()
+
             self.refresh_screen()
             self.draw()
 
