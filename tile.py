@@ -8,4 +8,4 @@ class Tile(pygame.Rect):
         self.y = y
         self.h = 30
         self.w = 32
-        self.tile_name = "enemy1"
+        self.tile_name = tile_name

@@ -21,7 +21,9 @@ class Game():
         self.dt = 1
 
         self.player = Player()
+        self.points = 0
         self.tiles = []
+        self.hearts_list = []
 
         self.collision_types = {}
 
@@ -36,9 +38,9 @@ class Game():
             texture = pygame.image.load("img\\" + img)
             self.textures[img.replace(".png","")] = texture
 
-    def colision_test_player(self):
+    def colision_test_player(self, tiles):
         hit_list = []
-        for tile in self.tiles:
+        for tile in tiles:
             if self.player.colliderect(tile):
                 hit_list.append(tile)
         return hit_list
@@ -46,7 +48,7 @@ class Game():
     def move_player(self):
         self.collision_types = {'top': False, 'bottom': False, 'left': False, 'right': False}
         self.player.x += self.player.x_speed
-        hit_list = self.colision_test_player()
+        hit_list = self.colision_test_player(self.tiles)
         for tile in hit_list:
             if self.player.x_speed > 0:
                 self.player.right = tile.left
@@ -63,7 +65,7 @@ class Game():
         else:
             self.player.y += self.player.y_speed
 
-        hit_list = self.colision_test_player()
+        hit_list = self.colision_test_player(self.tiles)
         for tile in hit_list:
             if self.player.y_speed > 0:
                 self.player.bottom = tile.top
@@ -76,6 +78,16 @@ class Game():
         if random.randint(1,CREATE_ENEMY_RATIO) == 1:
             x = random.randint(30,430)
             self.enemies_list.append(Bomb(x, -100, "enemy2"))
+
+    def enemy_collision(self):
+        for enemy in self.colision_test_player(self.enemies_list):
+            self.enemies_list.remove(enemy)
+            self.player.hp -= 1
+
+    def bonus_collision(self):
+        for bonus in self.colision_test_player(self.bonus_list):
+            self.points += bonus.points
+            self.bonus_list.remove(bonus)
 
     def create_bonus(self):
         if random.randint(1, CREATE_BONUS_RATIO) == 1:
@@ -108,6 +120,13 @@ class Game():
             self.player.y_speed -= JUMP_SPEED
             self.player.during_jump = True
 
+    def check_hearts(self):
+        self.hearts_list = []
+        for heart in range(self.player.hp):
+            self.hearts_list.append(Tile(heart * 30, 0, "heart_full"))
+        for heart in range(3 - self.player.hp):
+            self.hearts_list.append(Tile((heart + self.player.hp) * 30, 0 , "heart_empty"))
+
     def game(self):
         self.ENEMYMOVE = pygame.USEREVENT
         pygame.time.set_timer(self.ENEMYMOVE, ENEMY_MOVE_RATIO)
@@ -121,12 +140,13 @@ class Game():
             self.tiles.append(Tile(0, y * 32, "enemy1"))
             self.tiles.append(Tile(450, y * 32, "enemy1"))
 
+
+
         while True:
             self.check_keys()
             self.check_events()
 
-
-            # player move
+            # player
             self.move_player()
             if self.collision_types['bottom']:
                 self.player.air_timer = 0
@@ -135,7 +155,10 @@ class Game():
                 self.player.air_timer += 1
             self.player.reset_speed()
 
+            self.check_hearts()
+
             # enemy
+            self.enemy_collision()
             self.create_enemy()
 
             for enemy in self.enemies_list:
@@ -157,6 +180,8 @@ class Game():
             self.draw_screen.blit(self.textures[enemy.enemy_name], enemy)
         for bonus in self.bonus_list:
             self.draw_screen.blit(self.textures[bonus.bonus_name], bonus)
+        for heart in self.hearts_list:
+            self.draw_screen.blit(self.textures[heart.tile_name], heart)
 
     def refresh_screen(self):
         scaled = pygame.transform.scale(self.draw_screen, SCREEN_SIZE)

@@ -10,7 +10,7 @@ class Player(pygame.Rect):
         self.w = 20
         self.y_speed = GRAVITY
         self.x_speed = 0
-        self.hp = 3
+        self.hp = PLAYER_HP
         self.max_jump_y = MAX_JUMP
         self.air_timer = 0
         self.during_jump = False

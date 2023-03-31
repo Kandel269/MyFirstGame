@@ -1,11 +1,13 @@
 SCREEN_SIZE = (1280,720)
 DRAW_SCREEN_SIZE = (480,320)
 FRAMERATE = 60
-PLAYER_SPEED = 2
 GRAVITY = 1
+
+##player
 JUMP_SPEED = 2
 MAX_JUMP = 90                       ## Frame time
-
+PLAYER_SPEED = 2
+PLAYER_HP = 3
 
 ## enemy
 ENEMY_SPEED = 1
