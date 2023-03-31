@@ -26,6 +26,7 @@ class Game():
         self.hearts_list = []
 
         self.font_points = pygame.font.Font(r"Pacifico.ttf",40)
+        self.font_end = pygame.font.Font(r"Pacifico.ttf",20)
 
         self.collision_types = {}
 
@@ -127,11 +128,14 @@ class Game():
             self.player.during_jump = True
 
     def check_hearts(self):
+        if self.player.hp <= 0:
+            self.end(f"Koniec gry, twój wynik punktowy: {self.points}")
         self.hearts_list = []
         for heart in range(self.player.hp):
             self.hearts_list.append(Tile(heart * 30, 0, "heart_full"))
         for heart in range(3 - self.player.hp):
             self.hearts_list.append(Tile((heart + self.player.hp) * 30, 0 , "heart_empty"))
+
 
     def check_points(self):
         text = str(self.points)
@@ -180,14 +184,21 @@ class Game():
             #points
             self.check_points()
 
-            if self.player.hp <= 0:
-                self.end(f"Koniec gry, twój wynik punktowy: {self.points}")
-
             self.refresh_screen()
             self.draw()
 
     def end(self, text):
-        pass
+        self.end_txt = self.font_end.render(text, False,(255,0,0))
+        self.surf_end = self.surf_points.get_rect(center=(60,160))
+        empty_heart = Tile(0, 0, "heart_empty")
+        self.draw_screen.blit(self.textures[empty_heart.tile_name], empty_heart)
+        self.draw_screen.blit(self.end_txt,self.surf_end)
+        self.refresh_screen()
+        timer = END_TIME
+        while timer > 0:
+            timer -= self.dt
+            self.refresh_screen()
+        self.close()
 
     def draw(self):
         self.draw_screen.blit(self.textures["background"],(0,0))
