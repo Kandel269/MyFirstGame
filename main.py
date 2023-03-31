@@ -140,8 +140,6 @@ class Game():
             self.tiles.append(Tile(0, y * 32, "enemy1"))
             self.tiles.append(Tile(450, y * 32, "enemy1"))
 
-
-
         while True:
             self.check_keys()
             self.check_events()
@@ -166,6 +164,7 @@ class Game():
                     self.enemies_list.remove(enemy)
 
             # bonus
+            self.bonus_collision()
             self.create_bonus()
 
             self.refresh_screen()
