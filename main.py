@@ -92,9 +92,13 @@ class Game():
             self.bonus_list.remove(bonus)
 
     def create_bonus(self):
+        x = random.randint(30, 430)
         if random.randint(1, CREATE_BONUS_RATIO) == 1:
-            x = random.randint(30,430)
-            self.bonus_list.append(Bonus(x, -100, "enemy3", 100))
+            self.bonus_list.append(Bonus(x, -100, "G1",0, 100))
+        if random.randint(1, (CREATE_BONUS_RATIO*5)) == 1:
+            self.bonus_list.append(Bonus(x, -100, "G2", 2, 300))
+        if random.randint(1, (CREATE_BONUS_RATIO*20)) == 1:
+            self.bonus_list.append(Bonus(x, -100, "G3", 2, 800))
 
 
     def check_events(self):
@@ -176,8 +180,14 @@ class Game():
             #points
             self.check_points()
 
+            if self.player.hp <= 0:
+                self.end(f"Koniec gry, twój wynik punktowy: {self.points}")
+
             self.refresh_screen()
             self.draw()
+
+    def end(self, text):
+        pass
 
     def draw(self):
         self.draw_screen.blit(self.textures["background"],(0,0))
