@@ -25,6 +25,8 @@ class Game():
         self.tiles = []
         self.hearts_list = []
 
+        self.font_points = pygame.font.Font(r"Pacifico.ttf",40)
+
         self.collision_types = {}
 
         self.enemies_list = []
@@ -127,10 +129,14 @@ class Game():
         for heart in range(3 - self.player.hp):
             self.hearts_list.append(Tile((heart + self.player.hp) * 30, 0 , "heart_empty"))
 
+    def check_points(self):
+        text = str(self.points)
+        self.surf_points = self.font_points.render(text, False,(255,0,0))
+        self.points_txt = self.surf_points.get_rect(center=(int(DRAW_SCREEN_SIZE[0]/2),10))
+
     def game(self):
         self.ENEMYMOVE = pygame.USEREVENT
         pygame.time.set_timer(self.ENEMYMOVE, ENEMY_MOVE_RATIO)
-
         self.BONUSMOVE = pygame.USEREVENT
         pygame.time.set_timer(self.BONUSMOVE, ENEMY_MOVE_RATIO)
 
@@ -167,6 +173,9 @@ class Game():
             self.bonus_collision()
             self.create_bonus()
 
+            #points
+            self.check_points()
+
             self.refresh_screen()
             self.draw()
 
@@ -181,6 +190,7 @@ class Game():
             self.draw_screen.blit(self.textures[bonus.bonus_name], bonus)
         for heart in self.hearts_list:
             self.draw_screen.blit(self.textures[heart.tile_name], heart)
+        self.draw_screen.blit(self.surf_points,self.points_txt)
 
     def refresh_screen(self):
         scaled = pygame.transform.scale(self.draw_screen, SCREEN_SIZE)
