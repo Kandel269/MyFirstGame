@@ -114,7 +114,7 @@ class Game():
         #     x = random.randint(30,430)
         #     self.enemies_list.append(Enemy(x, -100, "enemy2"))
         if random.randint(1,CREATE_ENEMY_RATIO) == 1:
-            x = random.randint(30,430)
+            x = random.randint(31,430)
             self.enemies_list.append(Bomb(x, -100, "bomb"))
 
     def enemy_collision(self):
