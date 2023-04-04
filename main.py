@@ -77,15 +77,34 @@ class Game():
                 self.player.top = tile.bottom
                 self.collision_types['top'] = True
 
+    def colision_test_bomb(self, tiles,enemy):
+        hit_list = []
+        for tile in tiles:
+            if enemy.colliderect(tile):
+                hit_list.append(tile)
+        return hit_list
+
+    def move_bomb(self,enemy):
+
+        enemy.move()
+        hit_list = self.colision_test_bomb(self.tiles,enemy)
+
+        for tile in hit_list:
+            enemy.bottom = tile.top
+
     def create_enemy(self):
         if random.randint(1,CREATE_ENEMY_RATIO) == 1:
             x = random.randint(30,430)
-            self.enemies_list.append(Bomb(x, -100, "enemy2"))
+            self.enemies_list.append(Enemy(x, -100, "enemy2"))
+        if random.randint(1,CREATE_ENEMY_RATIO) == 1:
+            x = random.randint(30,430)
+            self.enemies_list.append(Bomb(x, -100, "enemy3"))
 
     def enemy_collision(self):
         for enemy in self.colision_test_player(self.enemies_list):
-            self.enemies_list.remove(enemy)
-            self.player.hp -= 1
+            if isinstance(enemy,Enemy):
+                self.enemies_list.remove(enemy)
+                self.player.hp -= 1
 
     def bonus_collision(self):
         for bonus in self.colision_test_player(self.bonus_list):
@@ -108,7 +127,10 @@ class Game():
                 self.close()
             if event.type == self.ENEMYMOVE:
                 for enemy in self.enemies_list:
-                    enemy.move()
+                    if isinstance(enemy,Bomb):
+                        self.move_bomb(enemy)
+                    else:
+                        enemy.move()
             if event.type == self.BONUSMOVE:
                 for bonus in self.bonus_list:
                     bonus.move()
