@@ -19,6 +19,7 @@ class Game():
         self.draw_screen = pygame.Surface(DRAW_SCREEN_SIZE)
         self.clock = pygame.time.Clock()
         self.dt = 1
+        self.current_time = pygame.time.get_ticks()
 
         self.player = Player()
         self.points = 0
@@ -91,14 +92,15 @@ class Game():
 
         for tile in hit_list:
             enemy.bottom = tile.top
+            enemy.on_ground = True
 
     def create_enemy(self):
+        # if random.randint(1,CREATE_ENEMY_RATIO) == 1:
+        #     x = random.randint(30,430)
+        #     self.enemies_list.append(Enemy(x, -100, "enemy2"))
         if random.randint(1,CREATE_ENEMY_RATIO) == 1:
             x = random.randint(30,430)
-            self.enemies_list.append(Enemy(x, -100, "enemy2"))
-        if random.randint(1,CREATE_ENEMY_RATIO) == 1:
-            x = random.randint(30,430)
-            self.enemies_list.append(Bomb(x, -100, "enemy3"))
+            self.enemies_list.append(Bomb(x, -100, "bomb"))
 
     def enemy_collision(self):
         for enemy in self.colision_test_player(self.enemies_list):
@@ -118,7 +120,7 @@ class Game():
         if random.randint(1, (CREATE_BONUS_RATIO*5)) == 1:
             self.bonus_list.append(Bonus(x, -100, "G2", 2, 300))
         if random.randint(1, (CREATE_BONUS_RATIO*20)) == 1:
-            self.bonus_list.append(Bonus(x, -100, "G3", 2, 800))
+            self.bonus_list.append(Bonus(x, -100, "G3", 2, 500))
 
 
     def check_events(self):
@@ -177,6 +179,8 @@ class Game():
             self.tiles.append(Tile(450, y * 32, "enemy1"))
 
         while True:
+            self.current_time = pygame.time.get_ticks()
+
             self.check_keys()
             self.check_events()
 
@@ -228,7 +232,15 @@ class Game():
         for tile in self.tiles:
             self.draw_screen.blit(self.textures[tile.tile_name], tile)
         for enemy in self.enemies_list:
-            self.draw_screen.blit(self.textures[enemy.enemy_name], enemy)
+            if isinstance(enemy,Bomb):
+                if self.current_time - enemy.last_update >= enemy.animation_cooldown and (enemy.on_ground == True):
+                    enemy.enemy_frame += 1
+                    enemy.last_update = self.current_time
+                    if enemy.enemy_frame >= 2:
+                        enemy.enemy_frame = 0
+                self.draw_screen.blit(self.textures[f"{enemy.enemy_name}{str(enemy.enemy_frame)}"], enemy)
+            else:
+                self.draw_screen.blit(self.textures[enemy.enemy_name], enemy)
         for bonus in self.bonus_list:
             self.draw_screen.blit(self.textures[bonus.bonus_name], bonus)
         for heart in self.hearts_list:
