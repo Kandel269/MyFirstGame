@@ -90,9 +90,14 @@ class Game():
         enemy.move()
         hit_list = self.colision_test_bomb(self.tiles,enemy)
 
+        if (enemy.on_ground == True) and self.current_time >= enemy.detonation_time:
+            self.enemies_list.remove(enemy)
+
         for tile in hit_list:
             enemy.bottom = tile.top
             enemy.on_ground = True
+            if enemy.detonation_time == 0:
+                enemy.detonation_time = self.current_time + BOMB_DETONATION_TIME
 
     def create_enemy(self):
         # if random.randint(1,CREATE_ENEMY_RATIO) == 1:

@@ -23,3 +23,4 @@ class Bomb(Enemy):
         self.last_update = 0
         self.animation_cooldown = BOMB_ANIMATION_COOLDOWN
         self.on_ground = False
+        self.detonation_time = 0
