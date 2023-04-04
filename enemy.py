@@ -24,3 +24,12 @@ class Bomb(Enemy):
         self.animation_cooldown = BOMB_ANIMATION_COOLDOWN
         self.on_ground = False
         self.detonation_time = 0
+
+class Boom(pygame.Rect):
+    def __init__(self,x,y,enemy_name, animation_cooldown):
+        self.x = x
+        self.y = y
+        self.h = 80
+        self.w = 80
+        self.enemy_name = enemy_name
+        self.animation_cooldown = animation_cooldown

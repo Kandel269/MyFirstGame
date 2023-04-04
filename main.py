@@ -33,6 +33,7 @@ class Game():
 
         self.enemies_list = []
         self.bonus_list = []
+        self.boom_list = []
 
         self.game()
 
@@ -92,6 +93,8 @@ class Game():
         hit_list = self.colision_test_bomb(self.tiles,enemy)
 
         if (enemy.on_ground == True) and self.current_time >= enemy.detonation_time:
+            boom = Boom(int(enemy.topleft[0]) - 30, int(enemy.topleft[1]) - 30, "explosion",self.current_time + BOOM_ANIMATION_COOLDOWN)
+            self.boom_list.append(boom)
             self.enemies_list.remove(enemy)
 
         for tile in hit_list:
@@ -100,6 +103,11 @@ class Game():
             if enemy.detonation_time == 0:
                 enemy.detonation_time = self.current_time + BOMB_DETONATION_TIME
                 enemy.enemy_frame += 1
+
+    def boom_life(self):
+        for boom in self.boom_list:
+            if self.current_time >= boom.animation_cooldown:
+                self.boom_list.remove(boom)
 
     def create_enemy(self):
         # if random.randint(1,CREATE_ENEMY_RATIO) == 1:
@@ -209,6 +217,9 @@ class Game():
                 if enemy.y > DRAW_SCREEN_SIZE[1]:
                     self.enemies_list.remove(enemy)
 
+            # boom
+            self.boom_life()
+
             # bonus
             self.bonus_collision()
             self.create_bonus()
@@ -249,6 +260,8 @@ class Game():
                 self.draw_screen.blit(self.textures[enemy.enemy_name], enemy)
         for bonus in self.bonus_list:
             self.draw_screen.blit(self.textures[bonus.bonus_name], bonus)
+        for boom in self.boom_list:
+            self.draw_screen.blit(self.textures[boom.enemy_name], boom)
         for heart in self.hearts_list:
             self.draw_screen.blit(self.textures[heart.tile_name], heart)
         self.draw_screen.blit(self.surf_points,self.points_txt)
