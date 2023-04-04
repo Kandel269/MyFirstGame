@@ -19,3 +19,8 @@ ENEMY_MOVE_RATIO = 40
 BONUS_SPEED = 3
 CREATE_BONUS_RATIO = 500
 BONUS_MOVE_RATIO = ENEMY_MOVE_RATIO
+
+
+
+# https://www.youtube.com/watch?v=nXOVcOBqFwM
+# PyGame Beginner Tutorial in Python - Loading Spritesheets
