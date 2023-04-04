@@ -40,6 +40,7 @@ class Game():
         self.textures = {}
         for img in os.listdir("img"):
             texture = pygame.image.load("img\\" + img)
+            texture.set_colorkey((255,255,255))
             self.textures[img.replace(".png","")] = texture
 
     def colision_test_player(self, tiles):
@@ -98,6 +99,7 @@ class Game():
             enemy.on_ground = True
             if enemy.detonation_time == 0:
                 enemy.detonation_time = self.current_time + BOMB_DETONATION_TIME
+                enemy.enemy_frame += 1
 
     def create_enemy(self):
         # if random.randint(1,CREATE_ENEMY_RATIO) == 1:
@@ -164,7 +166,6 @@ class Game():
             self.hearts_list.append(Tile(heart * 30, 0, "heart_full"))
         for heart in range(3 - self.player.hp):
             self.hearts_list.append(Tile((heart + self.player.hp) * 30, 0 , "heart_empty"))
-
 
     def check_points(self):
         text = str(self.points)
@@ -241,8 +242,8 @@ class Game():
                 if self.current_time - enemy.last_update >= enemy.animation_cooldown and (enemy.on_ground == True):
                     enemy.enemy_frame += 1
                     enemy.last_update = self.current_time
-                    if enemy.enemy_frame >= 2:
-                        enemy.enemy_frame = 0
+                    if enemy.enemy_frame >= 3:
+                        enemy.enemy_frame = 1
                 self.draw_screen.blit(self.textures[f"{enemy.enemy_name}{str(enemy.enemy_frame)}"], enemy)
             else:
                 self.draw_screen.blit(self.textures[enemy.enemy_name], enemy)
