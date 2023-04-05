@@ -15,3 +15,4 @@ class Bonus(pygame.Rect):
     def move(self):
         self.x += 0
         self.y += BONUS_SPEED + self.bonus_speed
+
