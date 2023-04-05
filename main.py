@@ -188,7 +188,6 @@ class Game():
         for heart in range(3 - self.player.hp):
             self.hearts_list.append(Tile((heart + self.player.hp) * 30, 0 , "heart_empty"))
 
-
     def check_points(self):
         text = str(self.points)
         self.surf_points = self.font_points.render(text, False,(255,0,0))
