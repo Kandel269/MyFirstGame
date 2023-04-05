@@ -126,12 +126,9 @@ class Game():
 
     def enemy_collision(self):
         for enemy in self.colision_test_player(self.enemies_list):
-            if isinstance(enemy,Enemy):
+            if enemy.player_collision:
                 self.enemies_list.remove(enemy)
                 self.player.hp -= 1
-            # if enemy.player_collision:
-            #     self.enemies_list.remove(enemy)
-            #     self.player.hp -= 1
             #     self.sounds['lose_life'].play()
 
     def bonus_collision(self):
