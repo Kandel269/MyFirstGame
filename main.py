@@ -131,7 +131,7 @@ class Game():
         x = random.randint(31, 430)
         y = random.randint(0, 290)
         if random.randint(1,100) == 1:
-            self.tiles_list.append(Tile(x,y,"wall",0))
+            self.tiles_list.append(Tile(x,y,"wall1",0))
 
     def enemy_collision(self):
         for enemy in self.colision_test_player(self.enemies_list):
