@@ -127,11 +127,33 @@ class Game():
         if random.randint(1, CREATE_ENEMY_RATIO*7) == 1:
             self.enemies_list.append(Bomb(x, -100, "bomb", 2))
 
+    def create_bonus(self):
+        x = random.randint(30, 430)
+        if random.randint(1, CREATE_BONUS_RATIO) == 1:
+            self.bonus_list.append(Bonus(x, -100, "G1",0, 100))
+        if random.randint(1, (CREATE_BONUS_RATIO*5)) == 1:
+            self.bonus_list.append(Bonus(x, -100, "G2", 2, 300))
+        if random.randint(1, (CREATE_BONUS_RATIO*20)) == 1:
+            self.bonus_list.append(Bonus(x, -100, "G3", 2, 500))
+
     def create_tile(self):
         x = random.randint(31, 430)
         y = random.randint(0, 290)
         if random.randint(1,100) == 1:
             self.tiles_list.append(Tile(x,y,"wall1",0))
+
+        for tile in self.tiles_list:
+            if tile.tile_name[0:5] == "wall1":
+                if tile.life_time == 0:
+                    tile.life_time = self.current_time + TILE_LIFE_TIME
+                    continue
+                if self.current_time >= tile.life_time:
+                    self.tiles_list.remove(tile)
+                    continue
+                for time in range(len(TILE_CHANGE_ANIMATION)):
+                    if self.current_time >= tile.life_time - TILE_CHANGE_ANIMATION[time]:
+                        tile.tile_name = f"wall1_{4-time}"
+                        break
 
     def enemy_collision(self):
         for enemy in self.colision_test_player(self.enemies_list):
@@ -151,16 +173,6 @@ class Game():
             if boom.dmg == False:
                 self.player.hp -= 1
                 boom.dmg = True
-
-    def create_bonus(self):
-        x = random.randint(30, 430)
-        if random.randint(1, CREATE_BONUS_RATIO) == 1:
-            self.bonus_list.append(Bonus(x, -100, "G1",0, 100))
-        if random.randint(1, (CREATE_BONUS_RATIO*5)) == 1:
-            self.bonus_list.append(Bonus(x, -100, "G2", 2, 300))
-        if random.randint(1, (CREATE_BONUS_RATIO*20)) == 1:
-            self.bonus_list.append(Bonus(x, -100, "G3", 2, 500))
-
 
     def check_events(self):
         for event in pygame.event.get():

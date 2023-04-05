@@ -26,9 +26,8 @@ BONUS_MOVE_RATIO = ENEMY_MOVE_RATIO
 
 ## Tile
 CREATE_TILE_RATIO = 2000
-TILE_LIFE_TIME = 20000
-
-
+TILE_LIFE_TIME = 22000
+TILE_CHANGE_ANIMATION = [2000,5000,7000,10000]
 
 # https://www.youtube.com/watch?v=nXOVcOBqFwM
 # PyGame Beginner Tutorial in Python - Loading Spritesheets
