@@ -17,8 +17,8 @@ class Enemy(pygame.Rect):
         self.y += ENEMY_SPEED
 
 class Bomb(Enemy):
-    def __init__(self,x,y,enemy_name):
-        super().__init__(x,y,enemy_name)
+    def __init__(self,x,y,enemy_name,enemy_speed = 1, player_collision = False):
+        super().__init__(x,y,enemy_name,enemy_speed, player_collision)
         self.enemy_frame = 0
         self.enemy_name = enemy_name
         self.last_update = 0
@@ -34,3 +34,4 @@ class Boom(pygame.Rect):
         self.w = 80
         self.enemy_name = enemy_name
         self.animation_cooldown = animation_cooldown
+        self.dmg = False
