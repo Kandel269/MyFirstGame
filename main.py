@@ -73,7 +73,8 @@ class Game():
 
         if self.player.during_jump:
             if self.player.air_timer <= MAX_JUMP:
-                self.player.y += self.player.y_speed - JUMP_SPEED
+                self.player.y_speed = self.player.y_speed - JUMP_SPEED
+                self.player.y += self.player.y_speed
             else:
                 self.player.y += self.player.y_speed
         else:
@@ -81,12 +82,14 @@ class Game():
 
         hit_list = self.colision_test_player(self.tiles_list)
         for tile in hit_list:
-            if self.player.y_speed > 0:
-                self.player.bottom = tile.top
-                self.collision_types['bottom'] = True
-            elif self.player.y_speed < 0:
+            if self.player.y_speed < 0:
                 self.player.top = tile.bottom
                 self.collision_types['top'] = True
+                self.player.air_timer += 1000
+            elif self.player.y_speed > 0:
+                self.player.bottom = tile.top
+                self.collision_types['bottom'] = True
+
 
     def colision_test_bomb(self, tiles,enemy):
         hit_list = []
@@ -127,7 +130,7 @@ class Game():
     def create_tile(self):
         x = random.randint(31, 430)
         y = random.randint(0, 290)
-        if random.randint(1,1000) == 1:
+        if random.randint(1,100) == 1:
             self.tiles_list.append(Tile(x,y,"wall",0))
 
     def enemy_collision(self):
