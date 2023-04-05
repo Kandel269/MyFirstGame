@@ -24,7 +24,7 @@ class Game():
 
         self.player = Player()
         self.points = 0
-        self.tiles = []
+        self.tiles_list = []
         self.hearts_list = []
 
         self.font_points = pygame.font.Font(r"Pacifico.ttf",40)
@@ -62,7 +62,7 @@ class Game():
     def move_player(self):
         self.collision_types = {'top': False, 'bottom': False, 'left': False, 'right': False}
         self.player.x += self.player.x_speed
-        hit_list = self.colision_test_player(self.tiles)
+        hit_list = self.colision_test_player(self.tiles_list)
         for tile in hit_list:
             if self.player.x_speed > 0:
                 self.player.right = tile.left
@@ -79,7 +79,7 @@ class Game():
         else:
             self.player.y += self.player.y_speed
 
-        hit_list = self.colision_test_player(self.tiles)
+        hit_list = self.colision_test_player(self.tiles_list)
         for tile in hit_list:
             if self.player.y_speed > 0:
                 self.player.bottom = tile.top
@@ -98,7 +98,7 @@ class Game():
     def move_bomb(self,enemy):
 
         enemy.move()
-        hit_list = self.colision_test_bomb(self.tiles,enemy)
+        hit_list = self.colision_test_bomb(self.tiles_list, enemy)
 
         if (enemy.on_ground == True) and self.current_time >= enemy.detonation_time:
             boom = Boom(int(enemy.topleft[0]) - 40, int(enemy.topleft[1]) - 40, "explosion",self.current_time + BOOM_ANIMATION_COOLDOWN)
@@ -121,8 +121,14 @@ class Game():
         x = random.randint(31, 430)
         if random.randint(1,CREATE_ENEMY_RATIO) == 1:
             self.enemies_list.append(Enemy(x, -100, "lightning", 0))
-        if random.randint(1, CREATE_ENEMY_RATIO) == 1:
+        if random.randint(1, CREATE_ENEMY_RATIO*7) == 1:
             self.enemies_list.append(Bomb(x, -100, "bomb", 2))
+
+    def create_tile(self):
+        x = random.randint(31, 430)
+        y = random.randint(0, 290)
+        if random.randint(1,1000) == 1:
+            self.tiles_list.append(Tile(x,y,"wall",0))
 
     def enemy_collision(self):
         for enemy in self.colision_test_player(self.enemies_list):
@@ -177,10 +183,13 @@ class Game():
             self.player.x_speed += int(round(PLAYER_SPEED * self.dt))
         if keys[pygame.K_LEFT]:
             self.player.x_speed -= int(round(PLAYER_SPEED * self.dt))
-        if keys[pygame.K_SPACE] and self.player.air_timer < 5 and not self.player.during_jump:
+        if keys[pygame.K_UP] and self.player.air_timer < 5 and not self.player.during_jump:
             self.player.y_speed -= JUMP_SPEED
             self.player.during_jump = True
             # self.sounds["jump"].play()
+        # if keys[pygame.K_SPACE]:
+        #     self.shoot()
+
 
     def check_hearts(self):
         if self.player.hp <= 0:
@@ -203,10 +212,10 @@ class Game():
         pygame.time.set_timer(self.BONUSMOVE, ENEMY_MOVE_RATIO)
 
         for x in range(16):
-            self.tiles.append(Tile((x * 30), 290, "wall"))
+            self.tiles_list.append(Tile((x * 30), 290, "wall"))
         for y in range(10):
-            self.tiles.append(Tile(0, y * 32, "wall"))
-            self.tiles.append(Tile(450, y * 32, "wall"))
+            self.tiles_list.append(Tile(0, y * 32, "wall"))
+            self.tiles_list.append(Tile(450, y * 32, "wall"))
 
         while True:
             self.current_time = pygame.time.get_ticks()
@@ -241,6 +250,9 @@ class Game():
             self.bonus_collision()
             self.create_bonus()
 
+            #tile
+            self.create_tile()
+
             #points
             self.check_points()
 
@@ -264,7 +276,7 @@ class Game():
     def draw(self):
         self.draw_screen.blit(self.textures["background"],(0,0))
         self.draw_screen.blit(self.textures["player"],self.player)
-        for tile in self.tiles:
+        for tile in self.tiles_list:
             self.draw_screen.blit(self.textures[tile.tile_name], tile)
         for enemy in self.enemies_list:
             if isinstance(enemy,Bomb):
