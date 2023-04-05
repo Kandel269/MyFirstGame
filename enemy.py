@@ -30,8 +30,8 @@ class Boom(pygame.Rect):
     def __init__(self,x,y,enemy_name, animation_cooldown):
         self.x = x
         self.y = y
-        self.h = 80
-        self.w = 80
+        self.h = 100
+        self.w = 100
         self.enemy_name = enemy_name
         self.animation_cooldown = animation_cooldown
         self.dmg = False

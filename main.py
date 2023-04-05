@@ -101,7 +101,7 @@ class Game():
         hit_list = self.colision_test_bomb(self.tiles,enemy)
 
         if (enemy.on_ground == True) and self.current_time >= enemy.detonation_time:
-            boom = Boom(int(enemy.topleft[0]) - 30, int(enemy.topleft[1]) - 30, "explosion",self.current_time + BOOM_ANIMATION_COOLDOWN)
+            boom = Boom(int(enemy.topleft[0]) - 40, int(enemy.topleft[1]) - 40, "explosion",self.current_time + BOOM_ANIMATION_COOLDOWN)
             self.boom_list.append(boom)
             self.enemies_list.remove(enemy)
 
@@ -120,7 +120,7 @@ class Game():
     def create_enemy(self):
         x = random.randint(31, 430)
         if random.randint(1,CREATE_ENEMY_RATIO) == 1:
-            self.enemies_list.append(Enemy(x, -100, "enemy2", 0))
+            self.enemies_list.append(Enemy(x, -100, "lightning", 0))
         if random.randint(1, CREATE_ENEMY_RATIO) == 1:
             self.enemies_list.append(Bomb(x, -100, "bomb", 2))
 
@@ -139,6 +139,12 @@ class Game():
             self.points += bonus.points
             self.bonus_list.remove(bonus)
             # self.sounds['collect'].play()
+
+    def boom_collision(self):
+        for boom in self.colision_test_player(self.boom_list):
+            if boom.dmg == False:
+                self.player.hp -= 1
+                boom.dmg = True
 
     def create_bonus(self):
         x = random.randint(30, 430)
@@ -200,10 +206,10 @@ class Game():
         pygame.time.set_timer(self.BONUSMOVE, ENEMY_MOVE_RATIO)
 
         for x in range(16):
-            self.tiles.append(Tile((x * 30), 290, "enemy1"))
+            self.tiles.append(Tile((x * 30), 290, "wall"))
         for y in range(10):
-            self.tiles.append(Tile(0, y * 32, "enemy1"))
-            self.tiles.append(Tile(450, y * 32, "enemy1"))
+            self.tiles.append(Tile(0, y * 32, "wall"))
+            self.tiles.append(Tile(450, y * 32, "wall"))
 
         while True:
             self.current_time = pygame.time.get_ticks()
@@ -232,6 +238,7 @@ class Game():
 
             # boom
             self.boom_life()
+            self.boom_collision()
 
             # bonus
             self.bonus_collision()
