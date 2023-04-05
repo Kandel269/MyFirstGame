@@ -20,6 +20,7 @@ class Game():
         self.draw_screen = pygame.Surface(DRAW_SCREEN_SIZE)
         self.clock = pygame.time.Clock()
         self.dt = 1
+        self.current_time = pygame.time.get_ticks()
 
         self.player = Player()
         self.points = 0
@@ -33,6 +34,7 @@ class Game():
 
         self.enemies_list = []
         self.bonus_list = []
+        self.boom_list = []
 
         self.game()
 
@@ -40,6 +42,7 @@ class Game():
         self.textures = {}
         for img in os.listdir("img"):
             texture = pygame.image.load("img\\" + img)
+            texture.set_colorkey((255,255,255))
             self.textures[img.replace(".png","")] = texture
 
     def load_sounds(self):
@@ -55,8 +58,6 @@ class Game():
             if self.player.colliderect(tile):
                 hit_list.append(tile)
         return hit_list
-
-    # def colision_test_bomb(self):
 
     def move_player(self):
         self.collision_types = {'top': False, 'bottom': False, 'left': False, 'right': False}
@@ -87,8 +88,37 @@ class Game():
                 self.player.top = tile.bottom
                 self.collision_types['top'] = True
 
+    def colision_test_bomb(self, tiles,enemy):
+        hit_list = []
+        for tile in tiles:
+            if enemy.colliderect(tile):
+                hit_list.append(tile)
+        return hit_list
+
+    def move_bomb(self,enemy):
+
+        enemy.move()
+        hit_list = self.colision_test_bomb(self.tiles,enemy)
+
+        if (enemy.on_ground == True) and self.current_time >= enemy.detonation_time:
+            boom = Boom(int(enemy.topleft[0]) - 30, int(enemy.topleft[1]) - 30, "explosion",self.current_time + BOOM_ANIMATION_COOLDOWN)
+            self.boom_list.append(boom)
+            self.enemies_list.remove(enemy)
+
+        for tile in hit_list:
+            enemy.bottom = tile.top
+            enemy.on_ground = True
+            if enemy.detonation_time == 0:
+                enemy.detonation_time = self.current_time + BOMB_DETONATION_TIME
+                enemy.enemy_frame += 1
+
+    def boom_life(self):
+        for boom in self.boom_list:
+            if self.current_time >= boom.animation_cooldown:
+                self.boom_list.remove(boom)
+
     def create_enemy(self):
-        x = random.randint(30, 430)
+        x = random.randint(31, 430)
         if random.randint(1,CREATE_ENEMY_RATIO) == 1:
             self.enemies_list.append(Enemy(x, -100, "enemy2", 0))
         if random.randint(1, CREATE_ENEMY_RATIO) == 1:
@@ -96,11 +126,13 @@ class Game():
 
     def enemy_collision(self):
         for enemy in self.colision_test_player(self.enemies_list):
-            if enemy.player_collision:
+            if isinstance(enemy,Enemy):
                 self.enemies_list.remove(enemy)
                 self.player.hp -= 1
-                self.sounds['lose_life'].play()
-
+            # if enemy.player_collision:
+            #     self.enemies_list.remove(enemy)
+            #     self.player.hp -= 1
+            #     self.sounds['lose_life'].play()
 
     def bonus_collision(self):
         for bonus in self.colision_test_player(self.bonus_list):
@@ -115,7 +147,7 @@ class Game():
         if random.randint(1, (CREATE_BONUS_RATIO*5)) == 1:
             self.bonus_list.append(Bonus(x, -100, "G2", 2, 300))
         if random.randint(1, (CREATE_BONUS_RATIO*20)) == 1:
-            self.bonus_list.append(Bonus(x, -100, "G3", 2, 800))
+            self.bonus_list.append(Bonus(x, -100, "G3", 2, 500))
 
 
     def check_events(self):
@@ -124,7 +156,10 @@ class Game():
                 self.close()
             if event.type == self.ENEMYMOVE:
                 for enemy in self.enemies_list:
-                    enemy.move()
+                    if isinstance(enemy,Bomb):
+                        self.move_bomb(enemy)
+                    else:
+                        enemy.move()
             if event.type == self.BONUSMOVE:
                 for bonus in self.bonus_list:
                     bonus.move()
@@ -172,6 +207,8 @@ class Game():
             self.tiles.append(Tile(450, y * 32, "enemy1"))
 
         while True:
+            self.current_time = pygame.time.get_ticks()
+
             self.check_keys()
             self.check_events()
 
@@ -193,6 +230,9 @@ class Game():
             for enemy in self.enemies_list:
                 if enemy.y > DRAW_SCREEN_SIZE[1]:
                     self.enemies_list.remove(enemy)
+
+            # boom
+            self.boom_life()
 
             # bonus
             self.bonus_collision()
@@ -224,9 +264,19 @@ class Game():
         for tile in self.tiles:
             self.draw_screen.blit(self.textures[tile.tile_name], tile)
         for enemy in self.enemies_list:
-            self.draw_screen.blit(self.textures[enemy.enemy_name], enemy)
+            if isinstance(enemy,Bomb):
+                if self.current_time - enemy.last_update >= enemy.animation_cooldown and (enemy.on_ground == True):
+                    enemy.enemy_frame += 1
+                    enemy.last_update = self.current_time
+                    if enemy.enemy_frame >= 3:
+                        enemy.enemy_frame = 1
+                self.draw_screen.blit(self.textures[f"{enemy.enemy_name}{str(enemy.enemy_frame)}"], enemy)
+            else:
+                self.draw_screen.blit(self.textures[enemy.enemy_name], enemy)
         for bonus in self.bonus_list:
             self.draw_screen.blit(self.textures[bonus.bonus_name], bonus)
+        for boom in self.boom_list:
+            self.draw_screen.blit(self.textures[boom.enemy_name], boom)
         for heart in self.hearts_list:
             self.draw_screen.blit(self.textures[heart.tile_name], heart)
         self.draw_screen.blit(self.surf_points,self.points_txt)
