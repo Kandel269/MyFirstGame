@@ -14,7 +14,7 @@ class Game():
         pygame.init()
 
         self.load_textures()
-        # self.load_sounds()
+        self.load_sounds()
 
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
         self.draw_screen = pygame.Surface(DRAW_SCREEN_SIZE)
@@ -45,11 +45,11 @@ class Game():
             texture.set_colorkey((255,255,255))
             self.textures[img.replace(".png","")] = texture
 
-    # def load_sounds(self):
-    #     self.sounds = {}
-    #     for sound in os.listdir("sounds"):
-    #         file = pygame.mixer.Sound("sounds\\" + sound)
-    #         self.sounds[sound.replace(".wav", "")] = file
+    def load_sounds(self):
+        self.sounds = {}
+        for sound in os.listdir("sounds"):
+            file = pygame.mixer.Sound("sounds\\" + sound)
+            self.sounds[sound.replace(".wav", "")] = file
 
 
     def colision_test_player(self, tiles):
@@ -136,6 +136,7 @@ class Game():
         if random.randint(1, (CREATE_BONUS_RATIO*20)) == 1:
             self.bonus_list.append(Bonus(x, -100, "G3", 2, 500))
 
+
     def create_tile(self):
         x = random.randint(31, 430)
         y = random.randint(0, 290)
@@ -160,13 +161,13 @@ class Game():
             if enemy.player_collision:
                 self.enemies_list.remove(enemy)
                 self.player.hp -= 1
-            #     self.sounds['lose_life'].play()
+                self.sounds['lose_life'].play()
 
     def bonus_collision(self):
         for bonus in self.colision_test_player(self.bonus_list):
             self.points += bonus.points
             self.bonus_list.remove(bonus)
-            # self.sounds['collect'].play()
+            self.sounds['collect'].play()
 
     def boom_collision(self):
         for boom in self.colision_test_player(self.boom_list):
@@ -201,7 +202,7 @@ class Game():
         if keys[pygame.K_UP] and self.player.air_timer < 5 and not self.player.during_jump:
             self.player.y_speed -= JUMP_SPEED
             self.player.during_jump = True
-            # self.sounds["jump"].play()
+            self.sounds["jump"].play()
         # if keys[pygame.K_SPACE]:
         #     self.shoot()
 
@@ -290,7 +291,6 @@ class Game():
 
     def draw(self):
         self.draw_screen.blit(self.textures["background"],(0,0))
-        self.draw_screen.blit(self.textures["player"],self.player)
         for tile in self.tiles_list:
             self.draw_screen.blit(self.textures[tile.tile_name], tile)
         for enemy in self.enemies_list:
@@ -310,6 +310,7 @@ class Game():
         for heart in self.hearts_list:
             self.draw_screen.blit(self.textures[heart.tile_name], heart)
         self.draw_screen.blit(self.surf_points,self.points_txt)
+        self.draw_screen.blit(self.textures["player"],self.player)
 
     def refresh_screen(self):
         scaled = pygame.transform.scale(self.draw_screen, SCREEN_SIZE)
